@@ -1,4 +1,4 @@
-
+import { v4 } from 'uuid';
 import { connect } from "../config/user.db.config";
 import { UserPojo } from "../models/user.model";
 
@@ -13,13 +13,14 @@ export class UserRepository {
     }
 
 
-async addUser (newUser: UserPojo) : Promise<number>{
+async addUser (newUser: UserPojo) : Promise<string>{
     try{
+        newUser.user_id = v4()
         newUser= await this._userRepository.create(newUser)
         return newUser.id
     } catch (error) {
         console.log(error)
-        return -1
+        return "ERROR"
     }
 }
 async getAllUsers(): Promise <UserPojo[]>{
@@ -45,7 +46,7 @@ async getUserbyEmailAndPassword(email:string, password:string): Promise<UserPojo
     return error;
     }
 }
-async getUserbyId(id:number) : Promise<UserPojo | undefined>{
+async getUserbyId(id:string) : Promise<UserPojo | undefined>{
     try{
         return await this._userRepository.findByPk(id)
     }catch (error) {
@@ -53,6 +54,23 @@ async getUserbyId(id:number) : Promise<UserPojo | undefined>{
         return undefined
     }
 
+}
+async updateUser(newUser: UserPojo): Promise<string> {
+    try {
+        console.log("%%%%%%%%%")
+
+    await this._userRepository.update(newUser, {
+
+        where: {
+        user_id: newUser.user_id,
+        deposit: newUser.deposit,
+        },
+    });
+    return newUser.user_id;
+    } catch (error) {
+    console.error(error);
+    return error.toString();
+    }
 }
 
 }

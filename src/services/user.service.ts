@@ -2,19 +2,20 @@ import { UserPojo } from './../data/models/user.model';
 import { NewUserDto, UserDto } from './../controllers/types';
 import { UserRepository } from '../data/repositories/user.repository';
 
+
 export class UserService{
     _userRepository: UserRepository
     constructor(){
         this._userRepository = new UserRepository()
     }
 
-    async addUser(user: NewUserDto): Promise<number> {
+    async addUser(user: NewUserDto): Promise<string> {
         const userPojo: UserPojo = this.parseDtoIntoPojo(user);
         const userPromise = await this._userRepository
         .addUser(userPojo)
-        .then((id_user) => {
-            console.log(id_user);
-            return id_user;
+        .then((user_id) => {
+            console.log(user_id);
+            return user_id;
         })
         .catch((error) => {
             console.error(error);
@@ -50,7 +51,7 @@ export class UserService{
         });
         return usersPromise;
     }
-    async getUserbyId (id: number): Promise<UserDto | undefined>{
+    async getUserbyId (id: string): Promise<UserDto | undefined>{
         const userPromise = await this._userRepository.getUserbyId(id).then(userAsPojo => {
         if(!!userAsPojo) {
             return this.parsePojoIntoDto(userAsPojo);
@@ -62,6 +63,17 @@ export class UserService{
         throw error;
         });
         return userPromise;
+    }
+
+    async updateUser(userUpdated: NewUserDto) : Promise<string> {
+        const userPojo : UserPojo = this.parseDtoIntoPojo(userUpdated)
+        const userPromise = await this._userRepository.updateUser(userPojo).then(user_id => {
+            return user_id
+        }).catch(error =>{
+            console.error(error);
+            throw error
+        })
+        return userPromise
     }
 
     parsePojoIntoDto (userPojo : UserPojo) : UserDto {
