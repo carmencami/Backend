@@ -14,7 +14,7 @@ export class CryptosService{
         .then(cryptosAsPojo =>{
             let cryptosAsDto : CryptoDto[] = []
             cryptosAsPojo.forEach(cryptoAsPojo => {
-                let cryptoAsDto = this.parsePojoIntoDto(cryptoAsPojo)
+                let cryptoAsDto = this.parseCryptoIntoDto(cryptoAsPojo)
                 cryptosAsDto.push(cryptoAsDto)
             })
             return cryptosAsDto
@@ -24,16 +24,27 @@ export class CryptosService{
         })
         return cryptoPromise
     }
+    async updateAmount(crypto_id: string, stock: number, operation: string) {
+        const cryptoPromise = await this._cryptosRepository.updateAmount(crypto_id, stock, operation)
+            .then(cryptosAsPojo => {
+                return cryptosAsPojo
+            })
+            .catch(error => {
+                console.log(error)
+                throw error
+            })
 
+        return cryptoPromise
+    }
 
-    parsePojoIntoDto (cryptoPojo : CryptoPojo) : CryptoDto {
+    parseCryptoIntoDto (cryptoPojo : CryptoPojo) : CryptoDto {
         const cryptoDto: CryptoDto = {
-            crypto_id : cryptoPojo.dataValues.crypto_id,
-            crypto_name : cryptoPojo.dataValues.crypto_name,
-            value: cryptoPojo.dataValues.value,
+            crypto_id : cryptoPojo.crypto_id,
+            crypto_name : cryptoPojo.crypto_name,
+            value: cryptoPojo.value,
             icon: cryptoPojo.dataValues.icon,
-            asset : cryptoPojo.dataValues.asset,
-            stock : cryptoPojo.dataValues.stock
+            asset : cryptoPojo.asset,
+            stock : cryptoPojo.stock
         }
         return cryptoDto
 

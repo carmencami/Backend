@@ -1,5 +1,4 @@
-export class UserDto{
-    user_id:string
+export class UserRegisterDto{
     username:string
     email:string
     password:string
@@ -7,8 +6,24 @@ export class UserDto{
     deposit:number
     birthdate:string
 }
-export type NewUserDto = Omit<UserDto, 'user_id'>
-
+export class userWalletDto {
+    userToken: string
+    crypto_id: string
+    amount: number
+}
+export class UserLoginDto {
+    username: string
+    password: string
+}
+export class userData {
+    fullname: string
+    user_id: string
+    balance: number
+}
+export class DataUserToken {
+    fullname: string
+    userToken: string
+}
 
 export class CryptoDto{
     crypto_id:string
@@ -20,7 +35,6 @@ export class CryptoDto{
 }
 
 export class CryptoUserDto{
-    user_id:string
     crypto_id:string
     amount:number
 }

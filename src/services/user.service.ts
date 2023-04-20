@@ -1,7 +1,8 @@
+import  jwt  from 'jsonwebtoken';
 import { UserPojo } from './../data/models/user.model';
-import { NewUserDto, UserDto } from './../controllers/types';
+import { UserLoginDto,UserRegisterDto, DataUserToken } from './../controllers/types';
 import { UserRepository } from '../data/repositories/user.repository';
-
+import { v4 as uuid } from 'uuid';
 
 export class UserService{
     _userRepository: UserRepository
@@ -9,89 +10,57 @@ export class UserService{
         this._userRepository = new UserRepository()
     }
 
-    async addUser(user: NewUserDto): Promise<string> {
-        const userPojo: UserPojo = this.parseDtoIntoPojo(user);
-        const userPromise = await this._userRepository
-        .addUser(userPojo)
-        .then((user_id) => {
-            console.log(user_id);
-            return user_id;
-        })
-        .catch((error) => {
-            console.error(error);
-            throw error;
-        });
-        return userPromise;
-    }
-    async getAllUsers() : Promise<UserDto[]>{
-        const userPromise = await this._userRepository.getAllUsers().then(usersAsPojo =>{
-            let usersAsDto : UserDto[] = []
-            usersAsPojo.forEach(userAsPojo => {
-                let userAsDto = this.parsePojoIntoDto(userAsPojo)
-                usersAsDto.push(userAsDto)
+    async addUser(user: UserRegisterDto): Promise<string | undefined> {
+
+        const id: string = uuid();
+        let newUserPojo = user as UserPojo
+        newUserPojo.user_id = id;
+        newUserPojo.deposit = 0;
+
+        const userPromise = await this._userRepository.addUser(newUserPojo)
+            .then(resp => {
+                return resp
+            }).catch(error => {
+                throw error
             })
-            return usersAsDto
-        }) .catch(error=>{
-            console.log(error)
-            throw error
-        })
         return userPromise
     }
-    async getUserbyEmailAndPassword(email:string, pass:string): Promise<UserDto> {
-        const usersPromise = await this._userRepository
-        .getUserbyEmailAndPassword(email, pass)
-        .then((userAsPojo) => {
-            let userAsDTO = this.parsePojoIntoDto(userAsPojo);
     
-            return userAsDTO;
-        })
-        .catch((error) => {
-            console.error(error);
-            throw error;
-        });
-        return usersPromise;
+    async getUserLoginId(user: UserLoginDto): Promise<DataUserToken | undefined> {
+        const userPromise = await this._userRepository.getUserLoginId(user)
+            .then(resp => {
+                console.log(resp)
+                if (resp) {
+                    return { userToken: this.firmarToken(resp.user_id), fullname: resp?.fullname, balance: resp.balance }
+                }
+                else {
+                    return undefined
+                }
+            })
+            .catch(error => {
+                throw error
+            })
+        return userPromise
     }
-    async getUserbyId (id: string): Promise<UserDto | undefined>{
-        const userPromise = await this._userRepository.getUserbyId(id).then(userAsPojo => {
-        if(!!userAsPojo) {
-            return this.parsePojoIntoDto(userAsPojo);
-        } else {
-            return undefined;
-        }
-        }).catch(error => {
-        console.log(error);
-        throw error;
-        });
-        return userPromise;
-    }
-
-    async updateUser(userUpdated: NewUserDto) : Promise<string> {
-        const userPojo : UserPojo = this.parseDtoIntoPojo(userUpdated)
-        const userPromise = await this._userRepository.updateUser(userPojo).then(user_id => {
-            return user_id
-        }).catch(error =>{
-            console.error(error);
-            throw error
-        })
+    
+    async updateBalance(user_id: string, balance: number): Promise<number | undefined> {
+        console.log(user_id, "  ", balance)
+        const userPromise = await this._userRepository.updateBalance(user_id, balance)
+            .then(resp => {
+                console.log(resp + "repuesta")
+                return resp;
+            })
+            .catch(error => {
+                throw error
+            })
         return userPromise
     }
 
-    parsePojoIntoDto (userPojo : UserPojo) : UserDto {
-        const userDto: UserDto = {
-            user_id : userPojo.user_id,
-            username : userPojo.username,
-            email: userPojo.email,
-            password: userPojo.password,
-            fullname : userPojo.fullname,
-            deposit : userPojo.deposit,
-            birthdate : userPojo.birthdate,
-        }
-        return userDto
-
-        
+    firmarToken(idUser: string) {
+        let token = jwt.sign({ user_id: idUser }, process.env.PHRASE!, {
+            expiresIn: '5h'
+        });
+        return token
     }
 
-parseDtoIntoPojo(userDto: NewUserDto): UserPojo {
-    return userDto as UserPojo;
-}
     }

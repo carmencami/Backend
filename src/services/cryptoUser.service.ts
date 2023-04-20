@@ -9,65 +9,46 @@ export class CryptoUserService{
     }
 
 
-    async getCryptosByUserId (user_id: string): Promise<CryptoUserDto[]>{
-        const cryptoUserPromise = await this._cryptoUserRepository
-        .getCryptosByUserId(user_id)
-        .then((cryptoUsersAsPojo) => {
-        let cryptoUsersAsDto: CryptoUserDto[] = [];
-        cryptoUsersAsPojo.forEach((cryptoUserAsPojo) => {
-            let cryptoUserAsDto = this.parsePojoIntoDto(cryptoUserAsPojo);
-            cryptoUsersAsDto.push(cryptoUserAsDto);
-        });
-        return cryptoUsersAsDto;
-        })
-        .catch((error) => {
-        console.error(error);
-        throw error;
-        });
 
-    return cryptoUserPromise;
-    }
-    async addCryptos(crypto: CryptoUserDto): Promise<string> {
-        let cryptoUserPojo: CryptoUserPojo = this.parseDtoIntoPojo(crypto);
-        const cryptosPromise = await this._cryptoUserRepository
-        .addCryptos(cryptoUserPojo)
-        .then((user_id) => {
-            return user_id;
+    async getAllUserCryptos(user_id: string) {
+        const cryptoPromise = await this._cryptoUserRepository.getAllUserCryptos(user_id).then(cryptosUsersAsPojo => {
+            let cryptos: CryptoUserDto[] = [];
+            cryptosUsersAsPojo.forEach(cryptoUserAsPojo => {
+                cryptos.push(this.parsePojoIntoDto(cryptoUserAsPojo));
+            });
+            return cryptos
+        }).catch(error => {
+            console.log(error)
+            throw error
         })
-        .catch((error) => {
-            console.error(error);
-            throw error;
-        });
-        return cryptosPromise;
+
+        return cryptoPromise
+    }
+    async SellCryptos(user_id: string, crypto_id: string, actions: string, amount: number) {
+        console.log(amount)
+        const cryptoPromise = await this._cryptoUserRepository.SellCrypto(user_id, crypto_id, actions, amount)
+            .then(cryptosUsersAsPojo => {
+
+                return cryptosUsersAsPojo
+            })
+            .catch(error => {
+                console.log(error)
+                throw error
+            })
+
+        return cryptoPromise
+    
     }
 
-    async updateCryptos(crypto: CryptoUserDto): Promise<string> {
-        const cryptoUserPojo: CryptoUserPojo = this.parseDtoIntoPojo(crypto);
-        const cryptosPromise = await this._cryptoUserRepository
-        .updateCryptos(cryptoUserPojo)
-        .then((user_id) => {
-            return user_id;
-        })
-        .catch((error) => {
-            console.error(error);
-            throw error;
-        });
-        return cryptosPromise;
-    }
+
 
     parsePojoIntoDto (cryptoUserPojo : CryptoUserPojo) : CryptoUserDto {
         const cryptoDto: CryptoUserDto = {
-            user_id : cryptoUserPojo.dataValues.user_id,
-            crypto_id : cryptoUserPojo.dataValues.crypto_id,
-            amount: cryptoUserPojo.dataValues.amount
+            crypto_id : cryptoUserPojo.crypto_id,
+            amount: cryptoUserPojo.amount
         }
         return cryptoDto
 
         
-    }
-    parseDtoIntoPojo(cryptoUserDto: CryptoUserDto): CryptoUserPojo {
-        // Los pojos no se incicializan como constantes
-    
-        return cryptoUserDto as CryptoUserPojo;
     }
 }

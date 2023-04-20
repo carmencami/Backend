@@ -21,7 +21,26 @@ async getAllCryptos(): Promise <CryptoPojo[]>{
         return []
     }
 }
-
+async updateAmount(crypto_id: string, stock: number, actions: string): Promise<CryptoPojo[]> {
+    try {
+        console.log(crypto_id)
+        let findCrypto = await this._cryptosRepository.findOne({
+            where: {
+                crypto_id: crypto_id
+            }
+        })
+        let newStock = 0
+        if (actions == 'buy') {
+            newStock = findCrypto.stock - stock
+        } else {
+            newStock = +findCrypto.stock + +stock
+        }
+        return await this._cryptosRepository.update({ stock: newStock }, { where: { crypto_id: crypto_id } });
+    } catch (error) {
+        console.log(error)
+        return []
+    }
+}
 
 }
 

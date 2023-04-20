@@ -1,6 +1,7 @@
-import { v4 } from 'uuid';
+import { userData, UserLoginDto } from './../../controllers/types';
 import { connect } from "../config/user.db.config";
 import { UserPojo } from "../models/user.model";
+
 
 export class UserRepository {
     _database : any = {}
@@ -13,39 +14,63 @@ export class UserRepository {
     }
 
 
-async addUser (newUser: UserPojo) : Promise<string>{
-    try{
-        newUser.user_id = v4()
-        newUser= await this._userRepository.create(newUser)
-        return newUser.id
-    } catch (error) {
-        console.log(error)
-        return "ERROR"
-    }
-}
-async getAllUsers(): Promise <UserPojo[]>{
-    try {
-        return await this._userRepository.findAll()
-    } catch (error){
-        console.error(error)
-        return []
-    }
-}
-async getUserbyEmailAndPassword(email:string, password:string): Promise<UserPojo> {
-    try {
-        const user = await this._userRepository.findOne({
-            where: {
-                email: email,
-                password: password
+    async addUser(user: UserPojo): Promise<string | undefined> {
+        try {
+            const findUser = await this._userRepository.findOne({
+                where: {
+                    username: user.username ,
+                }
+            })
+            if (findUser == null) {
+                await this._userRepository.create(user)
+                return 'User registered!'
+            } else {
+                return 'User exist!'
             }
-        });
-        console.log("user:::", user);
-        return user;
-    } catch (error) {
-        console.error(error);
-    return error;
+        } catch (error) {
+            console.error(error)
+            return undefined
+        }
     }
-}
+
+    async updateBalance(user_id: string, balance: number) {
+        console.log(balance)
+        try {
+            const findUser = await this._userRepository.findOne({
+                where: {
+                    user_id: user_id
+                }
+            })
+            let newBalance: number = + balance + +findUser.deposit
+            await this._userRepository.update({ deposit: newBalance }, {
+                where: {
+                    userId: user_id,
+                    deposit: balance
+                }
+            })
+            return newBalance
+
+        } catch (error) {
+            return undefined
+        }
+    }
+
+
+    async getUserLoginId(user: UserLoginDto): Promise<userData | undefined> {
+        console.log(user)
+        try {
+            const findUser = await this._userRepository.findOne({
+                where: {
+                    username: user.username,
+                    password: user.password
+                }
+            })
+            return { user_id: findUser.user_id, fullname: findUser.fullname, balance: findUser.deposit }
+        } catch (error) {
+            console.log(error)
+            return undefined
+        }
+    }
 async getUserbyId(id:string) : Promise<UserPojo | undefined>{
     try{
         return await this._userRepository.findByPk(id)
@@ -55,21 +80,24 @@ async getUserbyId(id:string) : Promise<UserPojo | undefined>{
     }
 
 }
-async updateUser(newUser: UserPojo): Promise<string> {
+async UserBalance(user_id: string, balance: number) {
+    console.log(balance)
     try {
-        console.log("%%%%%%%%%")
+        const findUser = await this._userRepository.findOne({
+            where: {
+                userId: user_id
+            }
+        })
+        let newBalance: number = + balance + +findUser.deposit
+        await this._userRepository.update({ deposit: newBalance }, {
+            where: {
+                userId: user_id
+            }
+        })
+        return newBalance
 
-    await this._userRepository.update(newUser, {
-
-        where: {
-        user_id: newUser.user_id,
-        deposit: newUser.deposit,
-        },
-    });
-    return newUser.user_id;
     } catch (error) {
-    console.error(error);
-    return error.toString();
+        return undefined
     }
 }
 

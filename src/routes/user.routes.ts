@@ -1,14 +1,13 @@
 import { userController } from './../controllers/user.controllers';
 import  express  from "express";
+import Jwt from '../token/auth-token';
 
 const router = express.Router()
 
 // TODO: Añadir endpoints
-router.post('/add', userController.addUser)
-router.get('/all', userController.getAllUsers)
-router.post('/login', userController.getUserbyEmailAndPassword)
-router.get('/get/:id', userController.getUserById)
-router.put('/update', userController.updateUser)
+router.post('/login', userController.getUserLoginId);
+router.post('/add', userController.addUser);
+router.post('/update', [Jwt.verifyToken], userController.updateBalance)
 
 
 export default router

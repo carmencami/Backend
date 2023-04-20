@@ -4,47 +4,32 @@ const cryptoUserService : CryptoUserService = new CryptoUserService()
 
 export const cryptoUserController = {
 
-    getCryptosByUserId : (req: any, res: any) =>{
-        try{
-            const user_id = req.params.id
-            cryptoUserService.getCryptosByUserId(user_id) .then (result =>{
-        (result != null) ? res.json(result) : res.sendStatus(404);
-                
-            })
-        } 
-        catch (Error){
-            console.log(Error)
+    getAllUserCrypto: (req: any, res: any) => {
+        let user_id = req.userId
+        return cryptoUserService.getAllUserCryptos(user_id).then(r => {
+            res.json(r)
+        }).catch(error => {
+            console.error(error)
             res.sendStatus(500)
-        }
+        })
     },
-    
-    addCryptos : (req: any, res: any) =>{
-        try{
-            const newCrypto = req.body
-            cryptoUserService.addCryptos(newCrypto) .then(result =>{
-                console.log(result);
-                res.json(result)
-            })
-        }
-        catch(Error){
-            console.log(Error);
-            res.sendStatus(500)
-        }
-    },
-    updateCryptos: (req: any, res: any) => {
 
-        try {
-          //El try catch es para gestionar que el req.body pueda estar mal y provoque un bad request.
-        const newCryptos = req.body;
-          //no puedo usar async await, porque eso paraliza la ejecución del front, es mejor usar .then()
-        cryptoUserService.updateCryptos(newCryptos).then((result) => {
-            console.log(result);
-            res.json(result);
-        });
-        } catch (exception) {
-        console.error(exception);
-        res.sendStatus(500);
-        }
+    SellCryptos: (req: any, res: any) => {
+        let user_id = req.user_id
+        let crypto_id = req.body.crypto_id
+        let actions = req.body.actions
+        let amount = req.body.amount
+        return cryptoUserService.SellCryptos(user_id, crypto_id, actions, amount)
+            .then(r => {
+                res.json(r)
+            })
+            .catch(error => {
+                console.error(error)
+                res.sendStatus(500)
+            })
     }
+    
+
+
 
 }
