@@ -1,4 +1,5 @@
 
+import { CryptoUserDto } from "../../controllers/types";
 import { connect } from "../config/cryptoUser.db.config";
 import { CryptoUserPojo } from "../models/crypto_user.model";
 
@@ -14,11 +15,13 @@ export class CryptoUserRepository {
     }
 
 
-    async getAllUserCryptos(user_id: string): Promise<CryptoUserPojo[]> {
+    async getAllUserCryptos(user_id: CryptoUserDto): Promise<CryptoUserPojo[]> {
+        console.log(user_id);
+        
         try {
             return await this._cryptoUserRepository.findAll({
                 where: {
-                    userId: user_id
+                    user_id: user_id.user_id
                 }
             });
         } catch (error) {
@@ -27,8 +30,24 @@ export class CryptoUserRepository {
         }
     }
 
+    async updateUserCrypto(userCrypto: CryptoUserPojo): Promise<string> {
+        const data = await this._cryptoUserRepository.findOne({ where: {
+        user_id: userCrypto.user_id,
+        crypto_id: userCrypto.crypto_id
+        }})
+        if (!!data) {
+        this._cryptoUserRepository.update({ amount: userCrypto.amount }, { where: {
+            user_id: userCrypto.user_id,
+            crypto_id: userCrypto.crypto_id
+        }})
+        return 'Updated'
+        } else {
+        this._cryptoUserRepository.create(userCrypto)
+        return 'Created'
+        }
+    }
 
-async SellCrypto(user_id: string, crypto_id: string, actions: string, amount: number): Promise<CryptoUserPojo[]> {
+/* async SellCrypto(user_id: string, crypto_id: string, actions: string, amount: number): Promise<CryptoUserPojo[]> {
     console.log(amount)
     try {
         let findWallet = await this._cryptoUserRepository.findOne({
@@ -75,5 +94,5 @@ async SellCrypto(user_id: string, crypto_id: string, actions: string, amount: nu
         console.log(error)
         return []
     }
-}
+} */
 }

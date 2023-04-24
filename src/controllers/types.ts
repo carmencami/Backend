@@ -18,6 +18,7 @@ export class UserLoginDto {
 export class userData {
     fullname: string
     user_id: string
+    username:string
     balance: number
 }
 export class DataUserToken {
@@ -36,6 +37,7 @@ export class CryptoDto{
 
 export class CryptoUserDto{
     crypto_id:string
+    user_id: string
     amount:number
 }
 

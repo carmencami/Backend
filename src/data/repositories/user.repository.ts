@@ -65,7 +65,7 @@ export class UserRepository {
                     password: user.password
                 }
             })
-            return { user_id: findUser.user_id, fullname: findUser.fullname, balance: findUser.deposit }
+            return { user_id: findUser.user_id, username: findUser.username, fullname: findUser.fullname, balance: findUser.deposit }
         } catch (error) {
             console.log(error)
             return undefined

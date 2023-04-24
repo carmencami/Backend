@@ -1,6 +1,6 @@
 import  jwt  from 'jsonwebtoken';
 import { UserPojo } from './../data/models/user.model';
-import { UserLoginDto,UserRegisterDto, DataUserToken } from './../controllers/types';
+import { userData,UserLoginDto,UserRegisterDto, DataUserToken } from './../controllers/types';
 import { UserRepository } from '../data/repositories/user.repository';
 import { v4 as uuid } from 'uuid';
 
@@ -31,7 +31,7 @@ export class UserService{
             .then(resp => {
                 console.log(resp)
                 if (resp) {
-                    return { userToken: this.firmarToken(resp.user_id), fullname: resp?.fullname, balance: resp.balance }
+                    return this.firmarToken(resp)
                 }
                 else {
                     return undefined
@@ -56,8 +56,10 @@ export class UserService{
         return userPromise
     }
 
-    firmarToken(idUser: string) {
-        let token = jwt.sign({ user_id: idUser }, process.env.PHRASE!, {
+    firmarToken(user: userData) {
+        console.log(user);
+        
+        let token = jwt.sign({ user_id: user.user_id, username: user.username, fullname: user.fullname, balance: user.balance }, process.env.PHRASE!, {
             expiresIn: '5h'
         });
         return token

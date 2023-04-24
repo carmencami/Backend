@@ -10,7 +10,7 @@ export class CryptoUserService{
 
 
 
-    async getAllUserCryptos(user_id: string) {
+    async getAllUserCryptos(user_id: CryptoUserDto) {
         const cryptoPromise = await this._cryptoUserRepository.getAllUserCryptos(user_id).then(cryptosUsersAsPojo => {
             let cryptos: CryptoUserDto[] = [];
             cryptosUsersAsPojo.forEach(cryptoUserAsPojo => {
@@ -24,7 +24,12 @@ export class CryptoUserService{
 
         return cryptoPromise
     }
-    async SellCryptos(user_id: string, crypto_id: string, actions: string, amount: number) {
+    async updateUserCrypto (userCrypto: CryptoUserDto): Promise<string> {
+        var userCryptoPojo : CryptoUserPojo = userCrypto as CryptoUserPojo
+        const updatedUserCrypto = await this._cryptoUserRepository.updateUserCrypto(userCryptoPojo)
+        return updatedUserCrypto
+      }
+    /* async SellCryptos(user_id: string, crypto_id: string, actions: string, amount: number) {
         console.log(amount)
         const cryptoPromise = await this._cryptoUserRepository.SellCrypto(user_id, crypto_id, actions, amount)
             .then(cryptosUsersAsPojo => {
@@ -38,13 +43,14 @@ export class CryptoUserService{
 
         return cryptoPromise
     
-    }
+    } */
 
 
 
     parsePojoIntoDto (cryptoUserPojo : CryptoUserPojo) : CryptoUserDto {
         const cryptoDto: CryptoUserDto = {
             crypto_id : cryptoUserPojo.crypto_id,
+            user_id: cryptoUserPojo.user_id,
             amount: cryptoUserPojo.amount
         }
         return cryptoDto

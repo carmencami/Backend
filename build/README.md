@@ -1,52 +1,16 @@
-# SantanderBack
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.2.18.
+* UserRouter
+POST :  (/api/users/login) -> Recibe los datos del usuarios ( username y password) 
+POST :  (/api/users/add) -> Recibe todos los datos del registro ( username, fullname, birthdate, deposit, password)
+POST /api/users/update -> Recibe el token para obtener el id usuario, y la cantidad a sumar al usuario
 
-## Development server
-
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+*CryptosRouter
+GET /api/cryptos/get/all -> Recoge los datos de la tabla de las cryptomonedas
+POST /api/cryptos/update -> Actualiza el stock  cuando un usuario compra o vende
 
 
-User - Endpoint
-
-addUser --> post. Para crear al usuario.('/add')
-getAllUsers --> get. Para traer a todos los usuarios. ('/all')
-getUserbyEmailAndPassword --> Para loguear al usuario a través del email y la contraseña.('/login')
-getUserById --> get . Para recoger a un usuario según su id. ('/get/:id')
-getUserById --> put . Para modificar datos de usuario. ('/update')
-
-
-Cryptos - Endpoint
-
-getAllCryptos --> get. Para traer a todas las cryptomonedas. ('/all')
-
-Crypto-user - Endpoint
-
-addCryptos --> post. Para comprar cryptomonedas.('/add')
-getCryptosByUserId --> get . Para recoger a un usuario según su id. ('/get/:id')
-updateCryptos --> put . Para modificar datos de compra de cryptomonedas. ('/update')
-
-
-
+* CryptoUserRouter
+GET /api/cryptos_user/cryptosuser -> Recibe el token y devuelve las cryptos que tiene el usuario
+POST /api/cryptos_user/update/buy -> Recibe el token, el id de la cryptomoneda, la cantidad y el tipo de operación
 
 
